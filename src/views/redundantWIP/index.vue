@@ -19,54 +19,64 @@
         <a-col class="gutter-row" :span="6">
           <a-row type="flex">
             <a-col :span="16" class="gutter-title"
-              >Total Factory <br/> WIP</a-col
+              >Total Factory <br />
+              WIP</a-col
             >
-            <a-col :span="8" class="gutter-value"
-              >92,165</a-col
-            >
+            <a-col :span="8" class="gutter-value">92,165</a-col>
           </a-row>
         </a-col>
         <a-col class="gutter-row" :span="6">
           <a-row type="flex">
             <a-col :span="16" class="gutter-title"
-              >Total Redundant <br/> WIP</a-col
+              >Total Redundant <br />
+              WIP</a-col
             >
-            <a-col :span="8" class="gutter-value"
-              >3,299</a-col
-            >
+            <a-col :span="8" class="gutter-value">3,299</a-col>
+          </a-row>
+        </a-col>
+        <a-col class="gutter-row" :span="6">
+          <a-row type="flex">
+            <a-col :span="16" class="gutter-title">Redundant <br />WIP%</a-col>
+            <a-col :span="8" class="gutter-value">3.6%</a-col>
           </a-row>
         </a-col>
         <a-col class="gutter-row" :span="6">
           <a-row type="flex">
             <a-col :span="16" class="gutter-title"
-              >Redundant <br/>WIP%</a-col
+              >Optimal Factory <br />WIP</a-col
             >
-            <a-col :span="8" class="gutter-value"
-              >3.6%</a-col
-            >
-          </a-row>
-        </a-col>
-        <a-col class="gutter-row" :span="6">
-          <a-row type="flex">
-            <a-col :span="16" class="gutter-title"
-              >Optimal Factory <br/>WIP</a-col
-            >
-            <a-col :span="8" class="gutter-value"
-              >88,866</a-col
-            >
+            <a-col :span="8" class="gutter-value">88,866</a-col>
           </a-row>
         </a-col>
       </a-row>
     </div>
     <div>
-  <a-table
-    :columns="columns"
-    :data-source="data"
-    bordered
-    size="middle"
-    :scroll="{ x: 'calc(700px + 50%)', y: 240 }"
-  />
-
+      <a-table
+        :columns="columns"
+        :data-source="data"
+        bordered
+        size="middle"
+        :scroll="{ x: 'calc(700px + 50%)', y: 240 }"
+      >
+      <template #cusSafetywip>
+          <span>
+          Safety WIP<br />
+           (pcs)
+          </span>
+        </template>
+        <template #cusActualwip>
+          <span>
+            Actual WIP<br />
+            ({{ actualDate }})
+          </span>
+        </template>
+        <template #customTitle>
+          <span> (+)Redundant WIP<br />(-)Redundant WIP </span>
+        </template>
+         <template #customreDundantwip>
+          <span> (+)Redundant %<br />(-)Redundant % </span>
+        </template>
+      </a-table>
     </div>
   </a-card>
 </template>
@@ -75,76 +85,67 @@ import { defineComponent, computed, ref } from "vue";
 import { DownloadOutlined } from "@ant-design/icons-vue";
 const columns = [
   {
-    title: 'Rank',
-    dataIndex: 'Rank',
-    key: 'Rank',
+    title: "Rank",
+    dataIndex: "Rank",
+    key: "Rank",
     width: 100,
-    //fixed: 'left',   
+    //fixed: 'left',
   },
   {
-    title: 'Machine for WIP',
+    title: "Machine for WIP",
     children: [
       {
-        title: 'Machine Category',
-        dataIndex: 'machinecategory',
-        key: 'machinecategory',
+        title: "Machine Category",
+        dataIndex: "machinecategory",
+        key: "machinecategory",
         width: 200,
       },
       {
-        title: 'Machine Group',
-        dataIndex: 'machinegroup',
-        key: 'machinegroup',
+        title: "Machine Group",
+        dataIndex: "machinegroup",
+        key: "machinegroup",
         width: 200,
       },
     ],
   },
   {
-    // title: 'Safety WIP',
-    // children: [
-    //   {
-    //     title: '(pcs)',
-    //     dataIndex: 'pcs',
-    //     key: 'pcs',
-    //     width: 100,
-    //   },
-    // ],
-     title: 'Safety WIP(pcs)',
-    dataIndex: 'safetywip',
-    key: 'safetywip',
+   
+    dataIndex: "safetywip",
+    key: "safetywip",
     width: 100,
+    slots: { title: "cusSafetywip", customRender: "name" },
   },
   {
-    title: 'Actual WIP',
-    dataIndex: 'actualwip',
-    key: 'actualwip',
+    dataIndex: "actualwip",
+    key: "actualwip",
     width: 100,
-    //fixed: 'left',   
+    slots: { title: "cusActualwip", customRender: "name" },
   },
-   {
-    title: '(+)Redundant WIP(-)Redundant WIP',
-    dataIndex: 'redundantwip',
-    key: 'redundantwip',
+  {
+    dataIndex: "redundantwip",
+    key: "redundantwip",
     width: 150,
-    //fixed: 'left',   
+    //fixed: 'left',
+    slots: { title: "customTitle", customRender: "name" },
   },
-   {
-    title: '(+)Redundant %',
-    dataIndex: 'redundantwip',
-    key: 'redundantwip',
+  {
+  
+    dataIndex: "redundantwip",
+    key: "redundantwip",
     width: 150,
-    //fixed: 'left',   
+     slots: { title: "customreDundantwip", customRender: "name" },
   },
 ];
 const data = [...Array(100)].map((_, i) => ({
   key: i,
-  name: 'John Brown',
+  name: "John Brown",
   age: i + 1,
-  street: 'Lake Park',
-  building: 'C',
+  street: "Lake Park",
+  building: "C",
   number: 2035,
-  companyAddress: 'Lake Street 42',
-  companyName: 'SoftLake Co',
-  gender: 'M',
+  companyAddress: "Lake Street 42",
+  companyName: "SoftLake Co",
+  gender: "M",
 }));
 export default defineComponent({
   name: "index",
@@ -159,25 +160,32 @@ export default defineComponent({
     return {
       focus,
       handleChange,
-         data,
+      data,
       columns,
       value3: ref("InputDemand1"),
+      actualDate: ref("2021-03-03"),
     };
   },
 });
 </script>
 <style lang="less" scoped>
-
 .gutter-box {
   background: #00a0e9;
   padding: 5px 0;
 }
-.gutter-title{
-    border: 1px darkgray solid; padding: 10px; background:#ededed;text-align:center
+.gutter-title {
+  border: 1px darkgray solid;
+  padding: 10px;
+  background: #ededed;
+  text-align: center;
 }
-.gutter-value{
-     border: 1px darkgray solid; padding: 10px; text-align:center;vertical-align: middle;display: flex;
-    align-items: center;
-    justify-content: center;
+.gutter-value {
+  border: 1px darkgray solid;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
