@@ -1,387 +1,230 @@
 <template>
   <div style="background: #fff; padding-left: 15px; padding-top: 10px">
-    <a-form-item label="Select Version" style="padding-bottom: 10px">
-      <a-select
-        v-model:value="value3"
-        @focus="focus"
-        ref="select"
-        @change="handleChange"
-      >
-        <a-select-option value="inputDemand">InputDemand</a-select-option>
-        <a-select-option value="inputDemand1">InputDemand1</a-select-option>
-        <a-select-option value="inputDemand2">InputDemand2</a-select-option>
-      </a-select>
+    <a-form-item label="Week" style="padding-bottom: 10px">
+      <a-week-picker @change="onChange" placeholder="Select week">
+        <template #suffixIcon>
+          <SmileOutlined />
+        </template>
+      </a-week-picker>
     </a-form-item>
   </div>
-  <a-card
-    :body-style="{ padding: '24px 32px', minHeight: '320px' }"
-    :bordered="false"
-  >
-    <a-button type="danger" style="margin-bottom: 10px">
+  <a-card :body-style="{ padding: '24px 32px', minHeight: '320px' }">
+    <a-button style="margin-bottom: 10px;margin-right:10px" type='primary'>
       <template #icon><DownloadOutlined /></template>
       Export
     </a-button>
+    <a-button style="margin-bottom: 10px" type='primary' @click="showMgChagnge" >
+      <span>{{ showOrhide }} MGRP Move </span>
+    </a-button>
+    <div class="gutter-example">
+      <a-row :gutter="16">
+        <a-col class="gutter-row" :span="6">
+          <a-row type="flex">
+            <a-col :span="16" class="gutter-title"
+              >Total Factory <br />
+              WIP</a-col
+            >
+            <a-col :span="8" class="gutter-value">92,165</a-col>
+          </a-row>
+        </a-col>
+        <a-col class="gutter-row" :span="6">
+          <a-row type="flex">
+            <a-col :span="16" class="gutter-title"
+              >Total Redundant <br />
+              WIP</a-col
+            >
+            <a-col :span="8" class="gutter-value">3,299</a-col>
+          </a-row>
+        </a-col>
+        <a-col class="gutter-row" :span="6">
+          <a-row type="flex">
+            <a-col :span="16" class="gutter-title">Redundant <br />WIP%</a-col>
+            <a-col :span="8" class="gutter-value">3.6%</a-col>
+          </a-row>
+        </a-col>
+        <a-col class="gutter-row" :span="6">
+          <a-row type="flex">
+            <a-col :span="16" class="gutter-title"
+              >Optimal Factory <br />WIP</a-col
+            >
+            <a-col :span="8" class="gutter-value">88,866</a-col>
+          </a-row>
+        </a-col>
+      </a-row>
+    </div>
     <div>
       <a-table
-        :showHeader="false"
+        :columns="tempcol"
+        :data-source="data"
         bordered
-        :columns="columnsMove"
-        :data-source="tableDataMove"
-        @change="handleChange"
-        :pagination="{ hideOnSinglePage: true }"
+        size="middle"
+        :scroll="{ x: 1200, y: 240 }"
       >
-        <template #action>
-          <a>action</a>
+        <template #cusSafetywip>
+          <span>
+            Safety WIP<br />
+            (pcs)
+          </span>
         </template>
-      </a-table>
-      <a-table
-        bordered
-        :columns="columns"
-        :data-source="tableData"
-        :scroll="{ x:true }"
-        @change="handleChange"
-        :customHeaderRow="customHeaderRow"
-      >
-        <template #action>
-          <a>action</a>
+        <template #cusActualwip>
+          <span>
+            Actual WIP<br />
+            ({{ actualDate }})
+          </span>
+        </template>
+        <template #customTitle>
+          <span> (＋)Redundant WIP<br />(－)Redundant WIP </span>
+        </template>
+        <template #customreDundantwip>
+          <span> (＋)Redundant %<br />(－)Redundant % </span>
         </template>
       </a-table>
     </div>
   </a-card>
 </template>
-
 <script>
 import { defineComponent, computed, ref } from "vue";
-import { DownloadOutlined } from "@ant-design/icons-vue";
-const tableDataMove = [
+import { DownloadOutlined, SmileOutlined } from "@ant-design/icons-vue";
+import { Moment } from "moment";
+const columns = [
   {
-    key: 1,
-    move: "Move",
-    "2020-04-01": 7728,
-    "2020-04-02": 7583,
-    "2020-04-03": 7710,
-    "2020-04-04": 8009,
-    "2020-04-05": 7659,
-    "2020-04-06": 7708,
+    title: "Rank",
+    dataIndex: "Rank",
+    key: "Rank",
+    width: 50,
+    align: "center",
+    //fixed: 'left',
+  },
+  {
+    title: "Machine for WIP",
+    children: [
+      {
+        title: "Machine Category",
+        dataIndex: "machinecategory",
+        key: "machinecategory",
+        width: 150,
+      },
+      {
+        title: "Machine Group",
+        dataIndex: "machinegroup",
+        key: "machinegroup",
+        width: 150,
+      },
+    ],
+  },
+  {
+    dataIndex: "safetywip",
+    key: "safetywip",
+    width: 70,
+    slots: { title: "cusSafetywip" },
+  },
+  {
+    dataIndex: "actualwip",
+    key: "actualwip",
+    width: 80,
+    slots: { title: "cusActualwip" },
+  },
+  {
+    dataIndex: "redundantwip",
+    key: "redundantwip",
+    width: 100,
+    //fixed: 'left',
+    slots: { title: "customTitle" },
+  },
+  {
+    dataIndex: "redundantwip",
+    key: "redundantwip",
+    width: 100,
+    slots: { title: "customreDundantwip" },
+  },
+  {
+    dataIndex: "machinegroupforMove",
+    key: "machinegroupforMove",
+    width: 100,
+    title: "Machine Group for Move",
   },
 ];
-const tableData = [
-  {
-    key: 1,
-    productid: "BAA215FH5T401",
-    "2020-04-01": 422,
-    "2020-04-02": 423,
-    "2020-04-03": 407,
-    "2020-04-04": 444,
-    "2020-04-05": 400,
-    "2020-04-06": 440,
-    "2020-04-07": 442,
-    "2020-04-08": "83.71%",
-    "2020-04-09": "83.71%",
-    "2020-04-10": "83.71%",
-    "2020-04-11": "83.71%",
-    "2020-04-12": "83.71%",
-    "2020-04-13": "83.71%",
-    "2020-04-14": "83.71%",
-  },
-  {
-    key: 2,
-    productid: "BAA215FH5T501",
-    "2020-04-01": 412,
-    "2020-04-02": 418,
-    "2020-04-03": 385,
-    "2020-04-04": 401,
-    "2020-04-05": 414,
-    "2020-04-06": 389,
-    "2020-04-07": 392,
-    "2020-04-08": "83.71%",
-    "2020-04-09": "83.71%",
-    "2020-04-10": "83.71%",
-    "2020-04-11": "83.71%",
-    "2020-04-12": "83.71%",
-    "2020-04-13": "83.71%",
-    "2020-04-14": "83.71%",
-  },
-  {
-    key: 3,
-    productid: "BAA430FH5V404",
-    "2020-04-01": 386,
-    "2020-04-02": 393,
-    "2020-04-03": 422,
-    "2020-04-04": 408,
-    "2020-04-05": 405,
-    "2020-04-06": 374,
-    "2020-04-07": 335,
-    "2020-04-08": "83.71%",
-    "2020-04-09": "83.71%",
-    "2020-04-10": "83.71%",
-    "2020-04-11": "83.71%",
-    "2020-04-12": "83.71%",
-    "2020-04-13": "83.71%",
-    "2020-04-14": "83.71%",
-  },
-  {
-    key: 4,
-    productid: "BAA430FH5V405",
-    "2020-04-01": 412,
-    "2020-04-02": 418,
-    "2020-04-03": 385,
-    "2020-04-04": 401,
-    "2020-04-05": 414,
-    "2020-04-06": 389,
-    "2020-04-07": 392,
-    "2020-04-08": "83.71%",
-    "2020-04-09": "83.71%",
-    "2020-04-10": "83.71%",
-    "2020-04-11": "83.71%",
-    "2020-04-12": "83.71%",
-    "2020-04-13": "83.71%",
-    "2020-04-14": "83.71%",
-  },
-  {
-    key: 5,
-    productid: "BAA430FH5V406",
-    "2020-04-01": 422,
-    "2020-04-02": 423,
-    "2020-04-03": 407,
-    "2020-04-04": 444,
-    "2020-04-05": 400,
-    "2020-04-06": 440,
-    "2020-04-07": 442,
-    "2020-04-08": "83.71%",
-    "2020-04-09": "83.71%",
-    "2020-04-10": "83.71%",
-    "2020-04-11": "83.71%",
-    "2020-04-12": "83.71%",
-    "2020-04-13": "83.71%",
-    "2020-04-14": "83.71%",
-  },
-];
+const data = [...Array(100)].map((_, i) => ({
+  key: i,
+  machinecategory: "Dry etch",
+  Rank: i + 1,
+  machinegroup: "EPOLY-**",
+  safetywip: Math.floor(Math.random() * (1000 - 230 + 1)) + 230,
+  actualwip: Math.floor(Math.random() * (1000 - 230 + 1)) + 230,
+  redundantwip: Math.floor(Math.random() * (1000 - 230 + 1)) + 230,
+  redundantwip: Math.floor(Math.random() * (1000 - 230 + 1)) + 230,
+  machinegroupforMove: "EPOLY-**",
+}));
 export default defineComponent({
   name: "index",
-  components: { DownloadOutlined },
+  components: { DownloadOutlined, SmileOutlined },
   setup() {
+    const isShowMg = ref(false);
+    const showOrhide = ref("Hide");
+    const tempcol = ref(columns);
+    const tempcol1 = ref(columns);
     const focus = () => {
       console.log("focus");
     };
-    const filteredInfo = ref();
-    const sortedInfo = ref();
-    const customHeaderRow = (column, index) => {
-      return {
-        style: {
-          color:
-            column.dataIndex == "2020-04-01" ? "yellow" : "rgba(0, 0, 0, 0.65)",
-        },
-      };
+    const onChange = (date, dateString) => {
+      console.log(date, dateString);
     };
-    const columns = computed(() => {
-      const filtered = filteredInfo.value || {};
-      const sorted = sortedInfo.value || {};
-      const handleChange = (pagination, filters, sorter) => {
-        console.log("Various parameters", pagination, filters, sorter);
-        filteredInfo.value = filters;
-        sortedInfo.value = sorter;
-      };
-      return [
-        {
-          title: "Product ID",
-          width: 180,
-          dataIndex: "productid",
-          key: "productid",
-          fixed: "left",
-        },
-        {
-          title: "2020-04-01",
-          dataIndex: "2020-04-01",
-          key: "2020-04-01",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-02",
-          dataIndex: "2020-04-02",
-          key: "2020-04-02",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-03",
-          dataIndex: "2020-04-03",
-          key: "2020-04-03",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-04",
-          dataIndex: "2020-04-04",
-          key: "2020-04-04",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-05",
-          dataIndex: "2020-04-05",
-          key: "2020-04-05",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-06",
-          dataIndex: "2020-04-06",
-          key: "2020-04-06",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-07",
-          dataIndex: "2020-04-07",
-          key: "2020-04-07",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-08",
-          dataIndex: "2020-04-08",
-          key: "2020-04-08",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-09",
-          dataIndex: "2020-04-09",
-          key: "2020-04-09",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-10",
-          dataIndex: "2020-04-10",
-          key: "2020-04-10",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-11",
-          dataIndex: "2020-04-11",
-          key: "2020-04-11",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-11",
-          dataIndex: "2020-04-11",
-          key: "2020-04-11",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-12",
-          dataIndex: "2020-04-12",
-          key: "2020-04-12",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-13",
-          dataIndex: "2020-04-13",
-          key: "2020-04-13",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-        {
-          title: "2020-04-14",
-          dataIndex: "2020-04-14",
-          key: "2020-04-14",
-          width: 150,
-          sorter: (a, b) => a.value - b.value,
-          sortOrder: sorted.columnKey === "value" && sorted.order,
-        },
-      ];
-    });
-    const columnsMove = computed(() => {
-      const filtered = filteredInfo.value || {};
-      const sorted = sortedInfo.value || {};
-      const handleChange = (pagination, filters, sorter) => {
-        console.log("Various parameters", pagination, filters, sorter);
-        filteredInfo.value = filters;
-        sortedInfo.value = sorter;
-      };
-      return [
-        {
-          title: "",
-          width: 180,
-          dataIndex: "move",
-          key: "move",
-          fixed: "left",
-        },
-        {
-          title: "",
-          width: 150,
-          dataIndex: "2020-04-01",
-          key: "2020-04-01",
-        },
-        {
-          title: "",
-          width: 150,
-          dataIndex: "2020-04-02",
-          key: "2020-04-02",
-        },
-        {
-          title: "",
-          width: 150,
-          dataIndex: "2020-04-03",
-          key: "2020-04-03",
-        },
-        {
-          title: "",
-          width: 150,
-          dataIndex: "2020-04-04",
-          key: "2020-04-04",
-        },
-        {
-          title: "",
-          width: 150,
-          dataIndex: "2020-04-05",
-          key: "2020-04-05",
-        },
-        //  {
-        //   title: "2020-04-06",
-        //   width: 150,
-        //   dataIndex: "2020-04-06",
-        //   key: "2020-04-06",
-        // }
-      ];
-    });
     const handleChange = () => {
       console.log("Various parameters");
     };
+    const showMgChagnge = () => {
+      isShowMg.value = !isShowMg.value;
+      console.log(isShowMg.value);
+      isShowMg.value
+        ? (showOrhide.value = "Show")
+        : (showOrhide.value = "Hide");
+      console.log(isShowMg.value, showOrhide.value);
+      if (isShowMg.value) {
+        tempcol1.value = JSON.parse(JSON.stringify(columns));
+        tempcol1.value.splice(6, 1);
+        tempcol.value = tempcol1.value;
+      } else {
+        tempcol.value = JSON.parse(JSON.stringify(columns));
+      }
+    };
     return {
-      tableData,
-      columns,
-      handleChange,
-      tableDataMove,
-      columnsMove,
       focus,
-      customHeaderRow,
+      isShowMg,
+      handleChange,
+      showMgChagnge,
+      tempcol,
+      showOrhide,
+      data,
+      columns,
+      onChange,
       value3: ref("InputDemand1"),
+      actualDate: ref("2021-03-03"),
+      value4: ref(),
     };
   },
 });
 </script>
-<style scoped>
-.ant-table td { white-space: nowrap; }
+<style lang="less" scoped>
+.gutter-example {
+  margin-bottom: 10px;
+}
+.gutter-box {
+  background: #00a0e9;
+  padding: 5px 0;
+}
+.gutter-title {
+  border: 1px darkgray solid;
+  padding: 10px;
+  background: #ededed;
+  text-align: center;
+}
+.gutter-value {
+  border: 1px darkgray solid;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 </style>
