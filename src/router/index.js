@@ -59,24 +59,14 @@ const routes = [
         component: BlankView,
         children: [
           {
-            path: 'backupPlan',
-            name: 'Backup Plan',
+            path: 'DCSIndex',
+            name: 'DCSIndex',
             meta: {
               page: {
                 closable: false
               }
             },
-            component: () => import('/@/views/demandConfirmation/BackupPlan.vue'),
-          },
-          {
-            path: 'machineLoading',
-            name: 'Machine Loading',
-            component: () =>import('/@/views/demandConfirmation/MachineLoading.vue'),
-          },
-          {
-            path: 'forecastOutputDate',
-            name: 'Forecast Output Date',
-            component: () =>import('/@/views/demandConfirmation/ForecastOutput.vue'),
+            component: () => import('/@/views/demandConfirmation/index.vue'),
           }
         ]
       },

@@ -84,7 +84,7 @@
         <a-menu-item
           key="dc14"
           @click="
-            goRouter($event, 'demandConfirmationSimulation/machineLoading')
+            goRouter($event, 'demandConfirmationSimulation/DCSIndex')
           "
           >Data Result</a-menu-item
         >
