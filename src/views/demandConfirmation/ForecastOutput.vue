@@ -79,6 +79,7 @@ export default defineComponent({
   name: "ForecastOutputDate",
   components: { DownloadOutlined },
   setup() {
+    console.log(22)
     const status = ref(0);
     const focus = () => {
       console.log("focus");

@@ -11,7 +11,7 @@ const routes = [
     path: '/',
     name: '首頁',
     component: TabsView,
-    redirect: '/setting',
+    redirect: '/versionTable',
     children: [
       {
         path: 'dashboard',
@@ -171,18 +171,28 @@ const routes = [
           }
         ]
       },
+      {
+        path: 'moveGapDetractor',
+        name: 'moveGapDetractor',
+        meta: {
+          icon: 'dashboard'
+        },
+        component: BlankView,
+        children: [
+          {
+            path: 'DMAIndex',
+            name: 'DMAIndex',
+            meta: {
+              page: {
+                closable: false
+              }
+            },
+            component: () => import('/@/views/movegapdetractor/index.vue'),
+          }
+        ]
+      },
     ]
   },
-  //   {
-  //     path: '/dashboard',
-  //     name: 'Dashboard',
-  //     component: () => import('/@/views/Dashboard.vue'),
-  //   },
-  //   {
-  //     path: '/setting',
-  //     name: 'Setting',
-  //     component: () => import('/@/views/Setting.vue'),
-  //   },
 ];
 
 export default createRouter({

@@ -16,6 +16,17 @@ export default defineConfig({
   base: "/",
   server: {
     port: 3000,
+    https:true,
+    proxy: {
+      // with options
+      '/api': {
+        target: 'https://localhost:44377/uP/',
+        changeOrigin: true,
+        ws: true,
+        secure: false,      
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   },
   build: {
     target: "modules",

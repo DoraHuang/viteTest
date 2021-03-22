@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #fff; padding-left: 15px; padding-top: 10px">
+  <!-- <div style="background: #fff; padding-left: 15px; padding-top: 10px">
     <a-form-item label="Week" style="padding-bottom: 10px">
       <a-week-picker @change="onChange" placeholder="Select week">
         <template #suffixIcon>
@@ -7,7 +7,7 @@
         </template>
       </a-week-picker>
     </a-form-item>
-  </div>
+  </div> -->
   <a-card :body-style="{ padding: '24px 32px', minHeight: '320px' }">
     v: for Original Plan Item,
     <span style="color: orange">o: for Optimal Item</span>
@@ -35,7 +35,7 @@
         :data-source="data"
         bordered
         size="middle"
-        :scroll="{ x: 1200, y: 240 }"
+        :scroll="{ x: 1200, y:400 }"
       >
         <template #cusDuration>
           <span>
